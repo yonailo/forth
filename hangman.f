@@ -1,1 +1,65 @@
-Scr# 12   0 marker forget-hangman  1 NEEDS .at NEEDS rnd NEEDS cell  2   3 CREATE hgm-w1 ," inspector"  4 CREATE hgm-w2 ," hospital"  5 CREATE hgm-w3 ," auxiliary"  6 3 CONSTANT hgm#  7 3 CONSTANT max-errors#  8 0 VARIABLE tries  9 0 VARIABLE guess-ptr 10 0 VARIABLE char-found 11 0 VARIABLE xpos 12 0 VARIABLE founds 13  14 CREATE hgm-words hgm-w1 , hgm-w2 , hgm-w3 , 15 -->Scr# 13   0 : shuffle ( -- )  1   hgm# rnd  2   CELL * hgm-words + guess-ptr !  3 ;  4   5 : guess-len ( -- n ) guess-ptr @ @ count  swap drop ;  6 : guess-addr ( -- addr ) guess-ptr @ @ count drop ;  7   8 : print-hidden ( -- )  9   guess-len 0 10   do 11     0 i 2* .at ." _ " 12   loop 13 ; 14 --> 15 Scr# 14   0 : print-guess ( c -- )  1   guess-len 0 do  2     dup guess-addr i + C@ = if  3        1 char-found ! guess-addr i + C@  4        0 i 2* .at emit ."  "  5     then  6   loop  7   19 xpos @ dup 2+ xpos ! .at emit ."  "  8   char-found @ 0 = if  9     tries @ 1+ tries ! 10   else founds @ 1+ founds ! 11   then 12   0 char-found ! 13   20 0 .at ." t:" tries @ . ." ,f:" founds @ . 14 ; 15 -->Scr# 15   0 : hangman ( -- )  1   cls shuffle print-hidden begin  2     23 0 .at ." Choose a letter (0 to end) :"  3     key  4     dup 48 = if \ 48 is ascii code for 0  5        quit  6     then  7     print-guess  8     founds @ guess-len = if  9       15 0 .at ." CONGRATULATIONS !!" quit 10     else 11       tries @ max-errors# = if 12         15 0 .at ." GAME OVER TRY AGAIN..." quit 13       then 14     then 15   again ;ok
+
+marker forget-hangman
+NEEDS .at NEEDS rnd NEEDS cell
+
+CREATE hgm-w1 ," inspector"
+CREATE hgm-w2 ," hospital"
+CREATE hgm-w3 ," auxiliary"
+3 CONSTANT hgm#
+3 CONSTANT max-errors#
+0 VARIABLE tries
+0 VARIABLE guess-ptr
+0 VARIABLE char-found
+0 VARIABLE xpos
+0 VARIABLE founds
+
+CREATE hgm-words hgm-w1 , hgm-w2 , hgm-w3 ,
+
+: shuffle ( -- )
+  hgm# rnd
+  CELL * hgm-words + guess-ptr !
+;
+
+: guess-len ( -- n ) guess-ptr @ @ count  swap drop ;
+: guess-addr ( -- addr ) guess-ptr @ @ count drop ;
+
+: print-hidden ( -- )
+  guess-len 0
+  do
+    0 i 2* .at ." _ "
+  loop
+;
+
+: print-guess ( c -- )
+  guess-len 0 do
+    dup guess-addr i + C@ = if
+       1 char-found ! guess-addr i + C@
+       0 i 2* .at emit ."  "
+    then
+  loop
+  19 xpos @ dup 2+ xpos ! .at emit ."  "
+  char-found @ 0 = if
+    tries @ 1+ tries !
+  else founds @ 1+ founds !
+  then
+  0 char-found !
+  20 0 .at ." t:" tries @ . .",f:" founds @ .
+;
+
+: hangman ( -- )
+  cls shuffle print-hidden begin
+    23 0 .at ." Choose a letter (0 to end) :"
+    key
+    dup 48 = if \ 48 is ascii code for 0
+       quit
+    then
+    print-guess
+    founds @ guess-len = if
+      15 0 .at ." CONGRATULATIONS !!" quit
+    else
+      tries @ max-errors# = if
+        15 0 .at ." GAME OVER TRY AGAIN..." quit
+      then
+    then
+  again 
+;
